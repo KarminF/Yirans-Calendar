@@ -85,15 +85,3 @@ def book_date(request):
 
     return JsonResponse({'status': 'error', 'message': 'invalid request'})
 
-
-def test(request):
-    if request.method == 'POST':
-        form = EventForm(request.POST)
-        if form.is_valid():
-            event_name = form.cleaned_data['event_name']
-            # 在这里你可以处理事件名称，比如保存到数据库中
-            # 这里只是简单的打印出来
-            print("Event Name:", event_name)
-    else:
-        form = EventForm()
-    return render(request, 'booking/test.html', {'form': form})
