@@ -1,0 +1,27 @@
+<!-- myapp/templates/myapp/event_form.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#openFormBtn").click(function(){
+                var eventName = prompt("请输入事件名称：", "");
+                if (eventName !== null && eventName !== "") {
+                    // 用户点击了确定按钮并输入了事件名称
+                    // 在这里你可以将事件名称发送给服务器端进行处理
+                    alert("您输入的事件名称是：" + eventName);
+                } else {
+                    // 用户点击了取消按钮或直接关闭了提示框
+                    alert("请输入有效的事件名称。");
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <button id="openFormBtn">Open Form</button>
+</body>
+</html>

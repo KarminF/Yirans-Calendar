@@ -1,0 +1,79 @@
+{% extends 'booking/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <link href="{% static 'styles.css' %}" rel="stylesheet">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                selectable: true,
+                selectHelper: true,
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next present',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay listViewMonth,listViewWeek,listViewDay'
+                },
+                customButtons: {
+                    present: {
+                        text: 'present',
+                        click: function (){
+                            calendar.today();
+                        }
+                    },
+                    listViewMonth: {
+                        text: 'list month',
+                        click: function() {
+                            calendar.changeView('listMonth');
+                        }
+                    },
+                    listViewWeek: {
+                        text: 'list week',
+                        click: function() {
+                            calendar.changeView('listWeek');
+                        }
+                    },
+                    listViewDay: {
+                        text: 'list day',
+                        click: function() {
+                            calendar.changeView('listDay');
+                        }
+                    },
+                },
+                events: '/api/bookings/',
+                dateClick: function (info) {
+                    if ('{{ user.is_authenticated }}' === 'True') {
+                        calendar.changeView('timeGridDay', info.dateStr);
+                    } else {
+                        alert('Please login to book a time.');
+                    }
+                },
+
+                select: function (selectionInfo) {
+                    if (!selectionInfo.allDay) {
+                        var title = prompt("enter event name：", "");
+                        if (title !== null && title !== "") {
+                            $.ajax({
+                                url: '/book/',
+                                type: 'POST',
+                                data: JSON.stringify({start: selectionInfo.startStr, end: selectionInfo.endStr, title: title}),
+                                contentType: 'application/json',
+                                success: function (response) {
+                                    alert(response.message);
+                                }
+                            });
+                        } else {
+                            alert("please enter a valid event name.");
+                        }
+
+                    }
+                }
+            });
+            calendar.render();
+        })
+        ;
+    </script>
+    <div id="calendar"></div>
+{% endblock %}
