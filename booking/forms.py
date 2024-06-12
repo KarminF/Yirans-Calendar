@@ -12,6 +12,7 @@ class RegistrationForm(forms.ModelForm):
         fields = ('username', 'email', 'password')
 
     def clean(self):
+        # examine whether 2 passwords same are
         cleaned_data = super(RegistrationForm, self).clean()
         password = cleaned_data.get('password')
         password2 = cleaned_data.get('password2')

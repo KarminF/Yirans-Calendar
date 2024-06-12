@@ -4,7 +4,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.views.decorators.csrf import csrf_exempt
 
 from .forms import LoginFrom, RegistrationForm
 from .models import Bookings
@@ -35,6 +34,7 @@ def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
+            # save user to database and login automatically
             user = form.save()
             login(request, user)
             return redirect('index')
@@ -51,6 +51,7 @@ def user_logout(request):
 
 @login_required
 def api_bookings(request):
+    # provide the list of events for the calendar to call
     booking_set = Bookings.objects.filter(user=request.user)
     bookings = []
     for booking in booking_set:
@@ -64,9 +65,9 @@ def api_bookings(request):
     return JsonResponse(bookings, safe=False)
 
 
-@csrf_exempt
 @login_required
 def book_date(request):
+    # get booking info from ajax and add to database
     if request.method == 'POST':
         data = json.loads(request.body)
         start = data.get('start')
@@ -83,9 +84,9 @@ def book_date(request):
     return JsonResponse({'status': 'error', 'message': 'invalid request'})
 
 
-@csrf_exempt
 @login_required
 def delete_booking(request):
+    # get booking id from ajax and delete booking from database
     if request.method == 'POST':
         data = json.loads(request.body)
         booking_id = data.get('id')
