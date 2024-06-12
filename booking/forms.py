@@ -29,7 +29,3 @@ class RegistrationForm(forms.ModelForm):
 class LoginFrom(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-
-
-class EventForm(forms.Form):
-    event_name = forms.CharField(label='Event Name', max_length=100)

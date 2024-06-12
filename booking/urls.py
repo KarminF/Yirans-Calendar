@@ -7,7 +7,6 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('logout/', views.user_logout, name='logout'),
     path('api/bookings/', views.api_bookings, name='api_bookings'),
-    path('book/', views.book_date, name='book'),
-    # path('api/events/', views.get_events, name='get_events'),
-    # path('api/add_event/', views.add_event, name='add_event'),
+    path('api/book/', views.book_date, name='book_date'),
+    path('api/delete/', views.delete_booking, name='delete_booking'),
 ]

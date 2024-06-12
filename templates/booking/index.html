@@ -19,25 +19,25 @@
                 customButtons: {
                     present: {
                         text: 'present',
-                        click: function (){
+                        click: function () {
                             calendar.today();
                         }
                     },
                     listViewMonth: {
                         text: 'list month',
-                        click: function() {
+                        click: function () {
                             calendar.changeView('listMonth');
                         }
                     },
                     listViewWeek: {
                         text: 'list week',
-                        click: function() {
+                        click: function () {
                             calendar.changeView('listWeek');
                         }
                     },
                     listViewDay: {
                         text: 'list day',
-                        click: function() {
+                        click: function () {
                             calendar.changeView('listDay');
                         }
                     },
@@ -50,19 +50,38 @@
                         alert('Please login to book a time.');
                     }
                 },
-
+                eventClick: function (eventClickInfo) {
+                    if (confirm("Do you want to delete booking " + eventClickInfo.event.title + "?")) {
+                        $.ajax({
+                            url: 'api/delete/',
+                            type: 'POST',
+                            data: JSON.stringify({id: eventClickInfo.event.id}),
+                            contentType: 'application/json',
+                            success: function (response) {
+                                alert(response.message);
+                                location.reload();
+                            }
+                        });
+                    }
+                },
                 select: function (selectionInfo) {
                     if (!selectionInfo.allDay) {
                         var title = prompt("enter event name：", "");
+                        var booking_id = 'booking_' + new Date().getTime();
                         if (title !== null && title !== "") {
                             $.ajax({
-                                url: '/book/',
+                                url: '/api/book/',
                                 type: 'POST',
-                                data: JSON.stringify({start: selectionInfo.startStr, end: selectionInfo.endStr, title: title}),
+                                data: JSON.stringify({
+                                    start: selectionInfo.startStr,
+                                    end: selectionInfo.endStr,
+                                    title: title,
+                                    booking_id: booking_id,
+                                }),
                                 contentType: 'application/json',
                                 success: function (response) {
                                     alert(response.message);
-                                }
+                                },
                             });
                         } else {
                             alert("please enter a valid event name.");
@@ -72,6 +91,7 @@
                 }
             });
             calendar.render();
+            console.log(calendar.getEvents().first())
         })
         ;
     </script>

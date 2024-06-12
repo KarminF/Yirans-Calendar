@@ -2,12 +2,11 @@ import json
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
-from .forms import LoginFrom, RegistrationForm, EventForm
+from .forms import LoginFrom, RegistrationForm
 from .models import Bookings
 
 
@@ -59,6 +58,7 @@ def api_bookings(request):
             'start': booking.start,
             'end': booking.end,
             'title': booking.title,
+            'id': booking.booking_id,
         }
         bookings.append(booking_data)
     return JsonResponse(bookings, safe=False)
@@ -72,16 +72,27 @@ def book_date(request):
         start = data.get('start')
         end = data.get('end')
         title = data.get('title')
+        booking_id = data.get('booking_id')
 
         try:
-
-            if Bookings.objects.filter((Q(start__lte=start) & Q(end__gte=start)) | (Q(start__lte=end) & Q(end__gte=end))):
-                return JsonResponse({'status': 'error', 'message': 'This time period is already booked.'})
-
-            booking = Bookings.objects.create(start=start, end=end, title=title, user=request.user)
+            Bookings.objects.create(start=start, end=end, title=title, user=request.user, booking_id=booking_id)
             return JsonResponse({'status': 'success', 'message': 'Booking successful!'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
 
     return JsonResponse({'status': 'error', 'message': 'invalid request'})
 
+
+@csrf_exempt
+@login_required
+def delete_booking(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        booking_id = data.get('id')
+        try:
+            Bookings.objects.filter(booking_id=booking_id).delete()
+            return JsonResponse({'status': 'success', 'message': 'Booking deleted!'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'invalid request'})
