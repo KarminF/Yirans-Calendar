@@ -1,7 +1,7 @@
 # Yirans-Calendar
-Ein Kalendar zum Terminbuchen oder so...
+Ein Kalender zum Terminbuchen oder so...
 
-Do install mysqlclient
+Do install django and mysqlclient
 `pip install django mysqlclient`
 
 edit your database info at settings.py
