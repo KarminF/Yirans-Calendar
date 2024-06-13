@@ -78,10 +78,10 @@ WSGI_APPLICATION = 'YiransCalendar.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '<database_name>',
-        'USER': '<database_username>',
-        'PASSWORD': '<database_password>',
-        'HOST': '<database_host>',
+        'NAME': 'yiranscalendar',
+        'USER': 'root',
+        'PASSWORD': '99907566',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
