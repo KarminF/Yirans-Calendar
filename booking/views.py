@@ -66,34 +66,27 @@ def api_bookings(request):
 
 
 @login_required
-def book_date(request):
+def add_booking(request):
     # get booking info from ajax and add to database
     if request.method == 'POST':
         data = json.loads(request.body)
-        start = data.get('start')
-        end = data.get('end')
-        title = data.get('title')
-        booking_id = data.get('booking_id')
-
         try:
-            Bookings.objects.create(start=start, end=end, title=title, user=request.user, booking_id=booking_id)
-            return JsonResponse({'status': 'success', 'message': 'Booking successful!'})
+            Bookings.objects.create(start=data.get('start'), end=data.get('end'), title=data.get('title'), user=request.user, booking_id=data.get('booking_id'))
+            return JsonResponse({'message': 'Booking successful!'})
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
+            return JsonResponse({'message': str(e)})
 
-    return JsonResponse({'status': 'error', 'message': 'invalid request'})
+    return JsonResponse({'message': 'invalid request'})
 
 
 @login_required
-def delete_booking(request):
+def delete_booking(request, booking_id):
     # get booking id from ajax and delete booking from database
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        booking_id = data.get('id')
+    if request.method == 'DELETE':
         try:
             Bookings.objects.filter(booking_id=booking_id).delete()
-            return JsonResponse({'status': 'success', 'message': 'Booking deleted!'})
+            return JsonResponse({'message': 'Booking deleted!'})
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
+            return JsonResponse({'message': str(e)})
 
-    return JsonResponse({'status': 'error', 'message': 'invalid request'})
+    return JsonResponse({'message': 'invalid request'})

@@ -9,6 +9,46 @@
             return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         }
 
+        async function deleteBooking(booking_id) {
+            try {
+                const response = await fetch(`/api/delete/${booking_id}`, {
+                    method: 'DELETE',
+                    headers: {'X-CSRFToken': getCsrfToken()}
+                });
+                const json = await response.json();
+                if (response.ok) {
+                    alert(json.message);
+                } else {
+                    throw new Error(`http error, status:${response.status}`);
+                }
+                location.reload();
+            }catch (e){
+                console.error('error in deleteBooking function:', e);
+            }
+        }
+        
+        async function addBooking(data = {}){
+            try{
+                const response = await fetch('/api/addbooking/',{
+                    method: 'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'X-CSRFToken': getCsrfToken(),
+                    },
+                    body:JSON.stringify(data),
+                });
+                const json = await response.json();
+                if (response.ok){
+                    alert(json.message)
+                }else {
+                    throw new Error(`http error, status:${response.status}`);
+                }
+                location.reload();
+            }catch (e){
+                console.error('error in addBooking function:', e);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -58,62 +98,35 @@
                 eventClick: function (eventClickInfo) {
                     {# delete event #}
                     if (confirm("Do you want to delete booking " + eventClickInfo.event.title + "?")) {
-                        $.ajax({
-                            url: 'api/delete/',
-                            type: 'POST',
-                            data: JSON.stringify({id: eventClickInfo.event.id}),
-                            contentType: 'application/json',
-                            beforeSend: function (xhr) {
-                                xhr.setRequestHeader('X-CSRFToken', getCsrfToken());
-                            },
-                                success: function (response) {
-                                    alert(response.message);
-                                    location.reload();
-                                }
-                            });
+                        deleteBooking(eventClickInfo.event.id);
                     }
-                    }
+                }
                 ,
-                    select: function (selectionInfo) {
-                        {# ban all day selections #}
-                        if (!selectionInfo.allDay) {
-                            {# user input booking title #}
-                            var title = prompt("enter event name：", "");
-                            {# generate unique booking id #}
-                            var booking_id = 'booking_' + new Date().getTime();
-                            if (title !== null && title !== "") {
-                                $.ajax({
-                                    url: '/api/book/',
-                                    type: 'POST',
-                                    data: JSON.stringify({
-                                        start: selectionInfo.startStr,
-                                        end: selectionInfo.endStr,
-                                        title: title,
-                                        booking_id: booking_id,
-                                    }),
-                                    contentType: 'application/json',
-                                    beforeSend: function (xhr) {
-                                        xhr.setRequestHeader('X-CSRFToken', getCsrfToken());
-                                    },
-                                    success: function (response) {
-                                        alert(response.message);
-                                        location.reload();
-                                    },
-                                    error: function (xhr) {
-                                        console.error("Error:", xhr.responseText);
-                                    }
+                select: function (selectionInfo) {
+                    {# ban all day selections #}
+                    if (!selectionInfo.allDay) {
+                        {# user input booking title #}
+                        const title = prompt("enter event name：", "");
+                        {# generate unique booking id #}
+                        const booking_id = 'booking_' + new Date().getTime();
+                        if (title !== null && title !== "") {
+                            addBooking({
+                                    start: selectionInfo.startStr,
+                                    end: selectionInfo.endStr,
+                                    title: title,
+                                    booking_id: booking_id,
                                 });
-                            } else {
-                                alert("please enter a valid event name.");
-                            }
-
+                        } else {
+                            alert("please enter a valid event name.");
                         }
+
                     }
-                });
+                }
+            });
             calendar.render();
             console.log(calendar.getEvents().first())
         })
-            ;
+        ;
     </script>
     <div id="calendar"></div>
 {% endblock %}
